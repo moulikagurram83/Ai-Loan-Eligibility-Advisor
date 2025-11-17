@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - Loan Eligibility Advisor</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .about-container { min-height: 100vh; padding: 2rem; }
+        .about-hero { text-align: center; padding: 4rem 2rem; background: white; border-radius: 16px; margin-bottom: 3rem; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08); border: 1px solid #e2e8f0; }
+        .about-hero h1 { font-size: 3rem; color: #1a202c; margin-bottom: 1rem; }
+        .about-hero p { font-size: 1.2rem; color: #2d3748; max-width: 800px; margin: 0 auto; line-height: 1.8; }
+        .about-content { max-width: 1200px; margin: 0 auto; }
+        .about-section { background: white; padding: 3rem; border-radius: 16px; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08); margin-bottom: 2rem; border: 1px solid #e2e8f0; }
+        .about-section h2 { font-size: 2rem; color: #1a202c; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; }
+        .about-section h3 { font-size: 1.5rem; color: #5b5fc7; margin: 2rem 0 1rem; }
+        .about-section p { color: #2d3748; line-height: 1.8; margin-bottom: 1rem; }
+        .about-section ul { list-style: none; padding: 0; }
+        .about-section li { padding: 0.75rem 0; color: #2d3748; line-height: 1.6; display: flex; align-items: flex-start; gap: 0.5rem; }
+        .about-section li::before { content: "✓"; color: #10b981; font-weight: bold; flex-shrink: 0; }
+        .architecture-img, .activity-img { width: 100%; max-width: 900px; margin: 2rem auto; display: block; border-radius: 12px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15); border: 3px solid #e2e8f0; background: white; padding: 1rem; }
+        .img-caption { text-align: center; color: #2d3748; font-weight: 600; margin-top: 1rem; font-size: 1rem; }
+        .mission-box { background: linear-gradient(135deg, rgba(91, 95, 199, 0.1), rgba(14, 165, 165, 0.1)); padding: 2rem; border-radius: 16px; border-left: 4px solid #5b5fc7; margin: 2rem 0; }
+        .tech-stack { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
+        .tech-item { background: white; padding: 1.5rem; border-radius: 16px; text-align: center; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); transition: transform 0.2s ease; }
+        .tech-item:hover { transform: translateY(-5px); }
+        .tech-icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
+        .tech-name { font-weight: 600; color: #1a202c; }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="logo">🏦 Loan Eligibility Advisor</div>
+            <div class="nav-links">
+                <a href="/">Home</a>
+                <a href="/about">About</a>
+                <a href="/index">Predict</a>
+                {% if session.get('logged_in') %}
+                    <a href="/profile">Profile</a>
+                    <a href="/logout" class="btn btn-outline">Logout</a>
+                {% else %}
+                    <a href="/login" class="btn btn-primary">Login</a>
+                {% endif %}
+            </div>
+        </nav>
+    </header>
+    <div class="about-container">
+        <div class="about-hero">
+            <h1>About Loan Eligibility Advisor</h1>
+            <p>Revolutionizing loan eligibility assessment with cutting-edge artificial intelligence and machine learning technology. Making financial decisions transparent, fast, and accessible.</p>
+        </div>
+        <div class="about-content">
+            <div class="about-section">
+                <h2>🎯 Our Mission</h2>
+                <div class="mission-box">
+                    <p style="font-size: 1.1rem; margin: 0;">We aim to provide <strong>innovative, efficient, and easy-to-use</strong> financial tools that assist individuals in making better financial decisions. Our goal is to simplify complex loan application processes using advanced technologies like <strong>Machine Learning</strong> and <strong>Artificial Intelligence</strong>.</p>
+                </div>
+            </div>
+            <div class="about-section">
+                <h2>🏗️ System Architecture</h2>
+                <p>The <strong>Loan Eligibility Advisor</strong> architecture is designed to seamlessly process user inputs, analyze them through a trained machine learning model, and deliver accurate and transparent predictions for loan approval.</p>
+                <h3>Key Components:</h3>
+                <ul>
+                    <li><strong>User Interface (UI):</strong> A modern, intuitive front-end built with Flask and responsive design to gather applicant information efficiently.</li>
+                    <li><strong>Data Preprocessing:</strong> Cleans and transforms input data into numerical form for machine learning compatibility using advanced feature engineering.</li>
+                    <li><strong>Machine Learning Model:</strong> Uses trained models like Random Forest with 95%+ accuracy to predict loan approval likelihood.</li>
+                    <li><strong>Prediction Engine:</strong> Runs the model on processed data and returns instant decisions with confidence scores.</li>
+                    <li><strong>AI Chatbot:</strong> Powered by Google Gemini for personalized financial guidance and support.</li>
+                </ul>
+                <img src="{{ url_for('static', filename='system_architecture.png') }}" alt="System Architecture Diagram" class="architecture-img">
+                <p class="img-caption">📊 System Architecture Flow Diagram</p>
+            </div>
+            <div class="about-section">
+                <h2>💻 Technology Stack</h2>
+                <div class="tech-stack">
+                    <div class="tech-item">
+                        <div class="tech-icon">🐍</div>
+                        <div class="tech-name">Python</div>
+                    </div>
+                    <div class="tech-item">
+                        <div class="tech-icon">🤖</div>
+                        <div class="tech-name">Scikit-learn</div>
+                    </div>
+                    <div class="tech-item">
+                        <div class="tech-icon">🌐</div>
+                        <div class="tech-name">Flask</div>
+                    </div>
+                    <div class="tech-item">
+                        <div class="tech-icon">⚡</div>
+                        <div class="tech-name">Streamlit</div>
+                    </div>
+                    <div class="tech-item">
+                        <div class="tech-icon">🧠</div>
+                        <div class="tech-name">Google Gemini</div>
+                    </div>
+                    <div class="tech-item">
+                        <div class="tech-icon">📊</div>
+                        <div class="tech-name">Pandas & NumPy</div>
+                    </div>
+                </div>
+            </div>
+            <div class="about-section">
+                <h2>📊 Project Development</h2>
+                <p>Throughout the development of <strong>Loan Eligibility Advisor</strong>, several key activities were carried out to ensure accuracy, performance, and exceptional user experience:</p>
+                <h3>Development Phases:</h3>
+                <ul>
+                    <li><strong>Data Collection:</strong> Gathered comprehensive loan data including income, credit scores, employment history, and approval outcomes.</li>
+                    <li><strong>Data Cleaning & EDA:</strong> Handled missing values, removed outliers, performed feature engineering, and visualized key trends.</li>
+                    <li><strong>Model Selection:</strong> Experimented with multiple algorithms including Logistic Regression, Random Forest, Decision Trees, and XGBoost.</li>
+                    <li><strong>Model Training & Optimization:</strong> Fine-tuned hyperparameters and evaluated using metrics like accuracy, precision, recall, and F1-score.</li>
+                    <li><strong>Chatbot Development:</strong> Integrated Google Gemini AI for intelligent financial guidance.</li>
+                    <li><strong>Deployment & Testing:</strong> Deployed the system and conducted extensive testing with real user scenarios.</li>
+                </ul>
+                <img src="{{ url_for('static', filename='Project Activity.png') }}" alt="Project Activity Timeline" class="activity-img">
+                <p class="img-caption">📈 Project Development Activity Timeline</p>
+            </div>
+            <div class="about-section" style="text-align: center;">
+                <h2>🚀 Ready to Get Started?</h2>
+                <p style="margin-bottom: 2rem;">Experience the power of AI-driven loan predictions today!</p>
+                <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                    <a href="/index" class="btn btn-primary">Try Prediction</a>
+                    <a href="/chatbot" class="btn btn-secondary">Chat with AI</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer><p>© 2024 Loan Eligibility Advisor | Empowering Financial Decisions with AI Technology</p></footer>
+    <a href="/chatbot" class="chatbot-fab" data-tooltip="Chat with AI"></a>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

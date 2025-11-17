@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediction Result - Loan Eligibility Advisor</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .result-container { min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 2rem; }
+        .result-card { background: white; padding: 3rem; border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12); max-width: 600px; width: 100%; text-align: center; border: 1px solid #e2e8f0; }
+        .result-icon { font-size: 5rem; margin-bottom: 1rem; }
+        .result-title { font-size: 2rem; font-weight: 800; margin-bottom: 1rem; }
+        .result-approved { color: #10b981; }
+        .result-rejected { color: #ef4444; }
+        .result-message { font-size: 1.2rem; color: #2d3748; margin-bottom: 2rem; line-height: 1.6; }
+        .result-details { background: rgba(91, 95, 199, 0.06); padding: 1.5rem; border-radius: 12px; margin: 2rem 0; text-align: left; border: 1px solid rgba(91, 95, 199, 0.15); }
+        .result-details h3 { color: #1a202c; margin-bottom: 1rem; font-size: 1.2rem; }
+        .result-details ul { list-style: none; padding: 0; }
+        .result-details li { padding: 0.5rem 0; color: #2d3748; display: flex; align-items: center; gap: 0.5rem; }
+        .action-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-top: 2rem; }
+        @keyframes confetti { 0% { transform: translateY(0) rotate(0deg); opacity: 1; } 100% { transform: translateY(100vh) rotate(360deg); opacity: 0; } }
+        .confetti { position: fixed; width: 10px; height: 10px; background: #6366f1; animation: confetti 3s linear; }
+    </style>
+</head>
+<body>
+    <div class="result-container">
+        <div class="result-card">
+            {% if 'Approved' in prediction_text %}
+                <div class="result-icon">✅</div>
+                <h1 class="result-title result-approved">Congratulations!</h1>
+                <p class="result-message">Your loan application has been <strong>APPROVED</strong> by our AI model. You meet the eligibility criteria for the requested loan amount.</p>
+                <div class="result-details">
+                    <h3>✨ What This Means:</h3>
+                    <ul>
+                        <li>✓ Your financial profile is strong</li>
+                        <li>✓ Good credit history detected</li>
+                        <li>✓ Income-to-loan ratio is favorable</li>
+                        <li>✓ Ready to proceed with application</li>
+                    </ul>
+                </div>
+                <div class="alert alert-success"><strong>Next Steps:</strong> Contact your bank to complete the formal application process. Keep your documents ready for verification.</div>
+            {% else %}
+                <div class="result-icon">❌</div>
+                <h1 class="result-title result-rejected">Application Not Approved</h1>
+                <p class="result-message">Unfortunately, your loan application does not meet the current eligibility criteria. Don't worry - we have suggestions to improve your chances.</p>
+                <div class="result-details">
+                    <h3>💡 Improvement Suggestions:</h3>
+                    <ul>
+                        <li>📈 Work on improving your credit score</li>
+                        <li>💰 Consider increasing your income or adding a co-applicant</li>
+                        <li>📉 Try applying for a smaller loan amount</li>
+                        <li>⏰ Extend the loan repayment term</li>
+                        <li>🏦 Clear existing debts to improve debt-to-income ratio</li>
+                    </ul>
+                </div>
+                <div class="alert alert-warning"><strong>Need Help?</strong> Chat with our AI assistant to understand what factors affected your application and get personalized advice.</div>
+            {% endif %}
+            <div class="action-buttons">
+                <a href="/index" class="btn btn-primary">Try Again</a>
+                <a href="/chatbot" class="btn btn-secondary">💬 Chat with AI</a>
+                <a href="/profile" class="btn btn-outline">View History</a>
+            </div>
+            <div style="margin-top: 2rem;"><a href="/" style="color: #2d3748; text-decoration: none;">← Back to Home</a></div>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% if 'Approved' in prediction_text %}
+    <script>
+        function createConfetti() {
+            const colors = ['#6366f1', '#14b8a6', '#f59e0b', '#10b981', '#ef4444'];
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animationDelay = Math.random() * 2 + 's';
+                    document.body.appendChild(confetti);
+                    setTimeout(() => confetti.remove(), 3000);
+                }, i * 50);
+            }
+        }
+        createConfetti();
+    </script>
+    {% endif %}
+</body>
+</html>
