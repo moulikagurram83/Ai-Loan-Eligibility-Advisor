@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Financial Advisor - Loan Eligibility Advisor</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .chatbot-container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px 15px 0 0;
+            text-align: center;
+        }
+
+        .chat-header h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+
+        .chat-header p {
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+        }
+
+        .chat-box {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 0 0 15px 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .chat-messages {
+            height: 500px;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+
+        .message {
+            margin-bottom: 12px;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .message.user {
+            flex-direction: row-reverse;
+        }
+
+        .message-content {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 8px;
+            word-wrap: break-word;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .message.bot .message-content {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px 8px 8px 2px;
+        }
+
+        .message.user .message-content {
+            background: #667eea;
+            color: white;
+            border-radius: 8px 8px 2px 8px;
+        }
+
+        .message-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 13px;
+            margin: 0 8px;
+            flex-shrink: 0;
+        }
+
+        .message.bot .message-avatar {
+            background: #667eea;
+            color: white;
+        }
+
+        .message.user .message-avatar {
+            background: #d1d5db;
+            color: #374151;
+        }
+
+        .chat-input-container {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .chat-input-form {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .send-button {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+
+        .send-button:hover {
+            transform: translateY(-2px);
+        }
+
+        .send-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .typing-indicator {
+            display: none;
+            padding: 10px 20px;
+            background: white;
+            border-radius: 20px;
+            width: fit-content;
+            border: 1px solid #e0e0e0;
+        }
+
+        .typing-indicator span {
+            height: 10px;
+            width: 10px;
+            background: #667eea;
+            border-radius: 50%;
+            display: inline-block;
+            margin: 0 2px;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+            }
+            30% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .welcome-message {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+
+        .welcome-message h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .quick-questions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .quick-question-btn {
+            padding: 10px 16px;
+            background: white;
+            border: 1px solid #667eea;
+            color: #667eea;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+
+        .quick-question-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-container">
+            <div class="logo">💰 Loan Advisor</div>
+            <ul class="nav-links">
+                <li><a href="{{ url_for('home') }}">Home</a></li>
+                <li><a href="{{ url_for('index') }}">Dashboard</a></li>
+                <li><a href="{{ url_for('chatbot_page') }}" class="active">AI Advisor</a></li>
+                <li><a href="{{ url_for('profile') }}">Profile</a></li>
+                <li><a href="{{ url_for('about') }}">About</a></li>
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="chatbot-container">
+        <div class="chat-box">
+            <div class="chat-header">
+                <h1>🤖 Loan Eligibility Prediction</h1>
+                
+            </div>
+
+            <div class="chat-messages" id="chatMessages">
+            </div>
+
+            <div class="chat-input-container">
+                <div class="typing-indicator" id="typingIndicator">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <form class="chat-input-form" id="chatForm">
+                    <input 
+                        type="text" 
+                        class="chat-input" 
+                        id="userInput" 
+                        placeholder="Type your question here..."
+                        autocomplete="off"
+                        required
+                    >
+                    <button type="submit" class="send-button" id="sendButton">Send</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const chatMessages = document.getElementById('chatMessages');
+        const chatForm = document.getElementById('chatForm');
+        const userInput = document.getElementById('userInput');
+        const sendButton = document.getElementById('sendButton');
+        const typingIndicator = document.getElementById('typingIndicator');
+
+        // Prediction state
+        let predictionMode = false;
+        let currentStep = 0;
+        let userData = {};
+
+        const questions = [
+            { key: 'gender', question: 'What is your gender?', options: ['Male', 'Female'] },
+            { key: 'married', question: 'Are you married?', options: ['Yes', 'No'] },
+            { key: 'dependents', question: 'How many dependents do you have?', options: ['0', '1', '2', '3+'] },
+            { key: 'education', question: 'What is your education level?', options: ['Graduate', 'Not Graduate'] },
+            { key: 'employed', question: 'Are you self-employed?', options: ['Yes', 'No'] },
+            { key: 'ApplicantIncome', question: 'What is your monthly income? (in ₹)', type: 'number' },
+            { key: 'CoapplicantIncome', question: 'What is your co-applicant monthly income? (in ₹, enter 0 if none)', type: 'number' },
+            { key: 'LoanAmount', question: 'What loan amount do you need? (in ₹)', type: 'number' },
+            { key: 'Loan_Amount_Term', question: 'What is your preferred loan term? (in days, e.g., 360 for 1 year)', type: 'number' },
+            { key: 'credit', question: 'What is your credit score? (300-900)', type: 'number', min: 300, max: 900 },
+            { key: 'area', question: 'What type of property area?', options: ['Urban', 'Semiurban', 'Rural'] }
+        ];
+
+        // Auto-scroll to bottom
+        function scrollToBottom() {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Add message to chat
+        function addMessage(content, isUser, showOptions = null) {
+            // Remove welcome message if exists
+            const welcomeMsg = document.querySelector('.welcome-message');
+            if (welcomeMsg) {
+                welcomeMsg.remove();
+            }
+
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
+            
+            const avatar = document.createElement('div');
+            avatar.className = 'message-avatar';
+            avatar.textContent = isUser ? 'U' : 'AI';
+            
+            const messageContent = document.createElement('div');
+            messageContent.className = 'message-content';
+            messageContent.innerHTML = content;
+            
+            messageDiv.appendChild(avatar);
+            messageDiv.appendChild(messageContent);
+            chatMessages.appendChild(messageDiv);
+
+            // Add option buttons if provided
+            if (showOptions && showOptions.length > 0) {
+                const optionsDiv = document.createElement('div');
+                optionsDiv.className = 'message bot';
+                optionsDiv.innerHTML = '<div class="message-avatar">AI</div>';
+                
+                const optionsContent = document.createElement('div');
+                optionsContent.className = 'message-content';
+                optionsContent.style.display = 'flex';
+                optionsContent.style.flexWrap = 'wrap';
+                optionsContent.style.gap = '8px';
+                
+                showOptions.forEach(option => {
+                    const btn = document.createElement('button');
+                    btn.textContent = option;
+                    btn.className = 'quick-question-btn';
+                    btn.style.margin = '0';
+                    btn.onclick = () => {
+                        userInput.value = option;
+                        chatForm.dispatchEvent(new Event('submit'));
+                    };
+                    optionsContent.appendChild(btn);
+                });
+                
+                optionsDiv.appendChild(optionsContent);
+                chatMessages.appendChild(optionsDiv);
+            }
+            
+            scrollToBottom();
+        }
+
+        // Show/hide typing indicator
+        function showTyping(show) {
+            typingIndicator.style.display = show ? 'block' : 'none';
+            if (show) scrollToBottom();
+        }
+
+        // Start prediction flow
+        function startPrediction() {
+            predictionMode = true;
+            currentStep = 0;
+            userData = {};
+            setTimeout(() => askNextQuestion(), 300);
+        }
+
+        // Ask next question
+        function askNextQuestion() {
+            if (currentStep < questions.length) {
+                const q = questions[currentStep];
+                const options = q.options || null;
+                addMessage(q.question, false, options);
+            } else {
+                // All questions answered, make prediction
+                makePrediction();
+            }
+        }
+
+        // Validate and process answer
+        function processAnswer(answer) {
+            const q = questions[currentStep];
+            
+            if (q.type === 'number') {
+                const num = parseFloat(answer);
+                if (isNaN(num) || num < 0) {
+                    addMessage('Please enter a valid number.', false);
+                    return false;
+                }
+                if (q.min && num < q.min) {
+                    addMessage(`Please enter a value of at least ${q.min}.`, false);
+                    return false;
+                }
+                if (q.max && num > q.max) {
+                    addMessage(`Please enter a value no more than ${q.max}.`, false);
+                    return false;
+                }
+                userData[q.key] = num;
+            } else if (q.options) {
+                const normalized = answer.trim();
+                const match = q.options.find(opt => 
+                    opt.toLowerCase() === normalized.toLowerCase()
+                );
+                if (!match) {
+                    addMessage(`Please choose from: ${q.options.join(', ')}`, false);
+                    return false;
+                }
+                userData[q.key] = match;
+            } else {
+                userData[q.key] = answer;
+            }
+            
+            currentStep++;
+            return true;
+        }
+
+        // Make prediction
+        async function makePrediction() {
+            showTyping(true);
+            addMessage('Processing your information...', false);
+            
+            try {
+                // Convert credit score to 0 or 1 (1 if >= 650, else 0)
+                const creditScore = userData.credit;
+                userData.credit = creditScore >= 650 ? '1' : '0';
+                
+                const formData = new FormData();
+                Object.keys(userData).forEach(key => {
+                    formData.append(key, userData[key]);
+                });
+                
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const html = await response.text();
+                showTyping(false);
+                
+                // Parse result from response
+                if (html.includes('APPROVED')) {
+                    addMessage('🎉 <strong>Congratulations!</strong><br><br>Your loan application has been <strong>APPROVED</strong>! You meet the eligibility criteria.<br><br>✓ Strong financial profile<br>✓ Good credit history<br>✓ Favorable income-to-loan ratio<br><br>You can proceed with the formal application process.', false);
+                } else {
+                    addMessage('❌ <strong>Application Not Approved</strong><br><br>Unfortunately, your application doesn\'t meet the current criteria. Here are some suggestions:<br><br>📈 Improve your credit score<br>💰 Increase your income or add a co-applicant<br>📉 Try a smaller loan amount<br>⏰ Extend the loan term<br>🏦 Clear existing debts', false);
+                }
+                
+                setTimeout(() => {
+                    addMessage('Would you like to check eligibility again? Type anything to restart!', false);
+                }, 1000);
+                
+            } catch (error) {
+                showTyping(false);
+                addMessage('Sorry, there was an error processing your prediction. Please try again.', false);
+            }
+            
+            predictionMode = false;
+            currentStep = 0;
+            userData = {};
+        }
+
+        // Handle form submission
+        chatForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const message = userInput.value.trim();
+            if (!message) return;
+            
+            // Add user message
+            addMessage(message, true);
+            userInput.value = '';
+            
+            // Disable input while processing
+            sendButton.disabled = true;
+            userInput.disabled = true;
+            showTyping(true);
+            
+            setTimeout(() => {
+                showTyping(false);
+                
+                if (predictionMode) {
+                    // Process answer in prediction mode
+                    if (processAnswer(message)) {
+                        setTimeout(() => askNextQuestion(), 300);
+                    }
+                } else {
+                    // Start prediction for the first time or restart
+                    if (!conversationStarted) {
+                        conversationStarted = true;
+                    }
+                    startPrediction();
+                }
+                
+                sendButton.disabled = false;
+                userInput.disabled = false;
+                userInput.focus();
+            }, 500);
+        });
+
+        // Show welcome message on page load
+        let conversationStarted = false;
+        
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                addMessage('👋 Hello! Welcome to the Loan Eligibility Prediction chatbot. I will ask you 11 questions to determine your loan eligibility. Type anything to get started!', false);
+            }, 500);
+        });
+
+        // Focus input on load
+        userInput.focus();
+    </script>
+</body>
+</html>

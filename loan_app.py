@@ -284,21 +284,10 @@ def predict():
 
 # ---------------- CHATBOT ----------------
 @app.route("/chatbot")
-def chatbot():
-    questions = [
-        "What is your gender? (Male/Female)",
-        "Are you married? (Yes/No)",
-        "How many dependents do you have? (0/1/2/3+)",
-        "What is your education level? (Graduate/Not Graduate)",
-        "Are you self-employed? (Yes/No)",
-        "What is your monthly applicant income?",
-        "What is your monthly co-applicant income?",
-        "What is the loan amount you want?",
-        "What is your loan term?",
-        "Credit history? (0 or 1)",
-        "What is the property area? (Urban/Semiurban/Rural)"
-    ]
-    return render_template("chatbot.html", questions=questions)
+def chatbot_page():
+    if not session.get("logged_in"):
+        return redirect("/login")
+    return render_template("chatbot.html")
 
 
 @app.route("/chat", methods=["POST"])
